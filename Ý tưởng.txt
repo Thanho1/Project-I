@@ -1,0 +1,53 @@
+Pepline: Video → Frame → Dataset → Keypoints → SVM → Realtime Demo
+1, Thu thập dataset
+- Ban đầu ý tưởng của e là lấy dữ liệu có sẵn trên roboflow
+- Sau xem xét lại thì thấy DL trên ấy, h/a chất lượng kém, bố cục chỉ ở 1 nơi, hành động ko rõ ràng, góc quay chưa đa dạng. nên e đã đổi p/an khác. E tải video trên youtube về, dài khoảng 2-5mins, sau đó e dùng OpenCV để cắt frame và kết hợp Mediapipe để lọc các frame có người. Sau đó e thực hiện gán nhãn thủ công và phân loại thành 3 nhóm:
+  + Shooting
+  + Dribbling
+  + Defense
+Phương pháp này giúp dataset đa dạng hơn về góc quay, môi trường và người thực hiện.
+2, Sử dụng Mediapipe (Feature Extraction)
+Tiếp theo e dùng Mediapipe để trích xuất 33 điểm khớp (keypoints)
+Với Mediapipe: Có 33 điểm trên cơ thể, mỗi điểm có: x, y, z, visibility
+=> Tổng feature: 33 x 4 = 132 features/ 1 ảnh (INPUT CHO SVM)
+Chuyển dữ liệu từ ảnh sang dạng vector đặc trưng (pose landmarks)
+để phù hợp với mô hình SVM.
+
+(Dataset ảnh → MediaPipe → 33 keypoints → vector → train SVM)
+Train trên pose của người (33 điểm khớp)
+output: 1 file data.csv dạng x0,y0,z0,v0,...,x32,y32,z32,v32,label
+3, kết quả train svm
+Model học tốt, không bị bias nặng, các class phân biệt rõ ràng.
+D:\Prj 1>python train_svm.py
+Accuracy: 0.9583333333333334
+
+Classification Report:
+               precision    recall  f1-score   support
+
+     defense       0.94      0.98      0.96        47
+   dribbling       1.00      0.94      0.97        31
+    shooting       0.94      0.94      0.94        18
+
+    accuracy                           0.96        96
+   macro avg       0.96      0.95      0.96        96
+weighted avg       0.96      0.96      0.96        96
+
+
+Confusion Matrix:
+ [[46  0  1] : 46 Đ/47 -> cực tốt
+ [ 2 29  0] : 29Đ/31, nhầm sang defense 2 lần, hợp lý vì pose dribbling đôi khi giống phòng thủ
+ [ 1  0 17]]: 17Đ/18 -> rất ổn
+=> Kết luận:
+ Mô hình SVM đạt độ chính xác khoảng 96% trên tập test.
+Các chỉ số precision, recall và f1-score đều cao (>0.9), cho thấy mô hình phân loại tốt các hành động bóng rổ.
+Một số nhầm lẫn nhỏ xảy ra giữa dribbling và defense do sự tương đồng về tư thế.
+4. Demo realtime webcam
+=> Pipeline demo:
+Webcam → MediaPipe → 33 keypoints → SVM → hiển thị label
+Hệ thống sử dụng MediaPipe để trích xuất pose 33 điểm,
+sau đó đưa vào mô hình SVM đã huấn luyện để dự đoán hành động theo thời gian thực.
+Để tăng độ ổn định, em sử dụng kỹ thuật smoothing trên nhiều frame liên tiếp.
+
+train_svm.py = build model
+demo_webcam.py = use model
+
