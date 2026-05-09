@@ -9,7 +9,7 @@ pose = mp_pose.Pose()
 dataset_path = "dataset"
 output_file = "data.csv"
 
-labels = ["dribbling", "shooting", "defense"]
+labels = ["dribbling", "shooting", "defense","idle"]
 
 with open(output_file, mode='w', newline='') as f:
     writer = csv.writer(f)
