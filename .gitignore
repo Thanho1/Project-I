@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Data (nặng, không nên push lên GitHub)
+data/raw_videos/
+data/dataset/
+data/dataset_test/
+
+# Video demo / record
+docs/demo/*.avi
+docs/demo/*.mp4
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
