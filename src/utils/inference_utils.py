@@ -55,6 +55,31 @@ def predict_action(vec, model, scaler, threshold=0.7):
     return label, confidence
 
 
+def pose_to_vector_with_velocity(landmarks, prev_vec):
+    """
+    Tạo feature vector 264 chiều (position + velocity) cho model v2.
+
+    Args:
+        landmarks: result.pose_landmarks.landmark (33 landmarks hiện tại)
+        prev_vec: vector position (132 chiều) của frame trước, hoặc None
+                  nếu là frame đầu tiên.
+
+    Trả về:
+        full_vec (264 chiều): nối position + velocity
+        current_vec (132 chiều): position hiện tại, dùng làm prev_vec
+                                  cho frame kế tiếp
+    """
+    current_vec = pose_to_vector(landmarks)
+
+    if prev_vec is None:
+        velocity = np.zeros_like(current_vec)
+    else:
+        velocity = current_vec - prev_vec
+
+    full_vec = np.concatenate([current_vec, velocity])
+    return full_vec, current_vec
+
+
 def draw_skeleton(frame, pose_landmarks):
     """Vẽ skeleton (landmarks + connections) lên frame."""
     mp_drawing.draw_landmarks(
