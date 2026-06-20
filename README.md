@@ -209,6 +209,7 @@ python -m src.inference.demo_webcam_v2
 - Thí nghiệm v2 (position + velocity) cho thấy việc thêm thông tin thời gian là cần thiết nhưng cách lấy mẫu velocity hiện tại chưa phù hợp (do dataset lấy theo threshold thay đổi pose, không phải frame liên tiếp). Hướng tiếp theo: trích keypoints từ video gốc theo frame liên tiếp thực sự (fps cố định), rồi thử lại velocity hoặc sequence model(LSTM/Transformer).
 - Dataset còn nhỏ, cần thu thập thêm nhiều người chơi/góc camera khác nhau để tăng khả năng tổng quát hoá.
 - Hiện chỉ xử lý 1 người trong frame; có thể mở rộng multi-person tracking.
+- Cách chia train/test hiện tại (train_test_split ngẫu nhiên theo ảnh) có thể gây data leakage do các frame từ cùng một video xuất hiện ở cả 2 tập. Hướng cải thiện: chia theo video group để đảm bảo tập test hoàn toàn độc lập
 
 ## License
 
